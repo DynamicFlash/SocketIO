@@ -15,12 +15,50 @@ app.use(express.static(publicPath));
 
 io.on('connection',(socket)=>{
 	console.log('new user connected');
-
+	var d = new Date(); 
+	var time = 	`${d.getHours()}: `+`${d.getMinutes()} :`+ `${d.getSeconds()}`;
+	
 	socket.on('disconnect',()=>{
 		console.log('user disconnected');
+	})
+
+	// socket.emit('newEmail',{
+	// 	from : 'mike@example.com',
+	// 	text : 'hey. what is going on',
+	// 	createAt: 123
+	// });
+	
+	socket.emit('newMessage', {
+		text : "welcome to chat room",
+		createdAt : `${time}`
+	})
+
+	socket.on('createEmail',(newEmail)=>{
+		console.log('Create email', newEmail);
+	})
+
+	socket.on('createMessage',(Message)=>{
+		var d = new Date(); 
+		var time = 	`${d.getHours()}: `+`${d.getMinutes()} :`+ `${d.getSeconds()}`;
+		Message.time = time;
+		console.log('Create email',Message);
+
+		io.emit('newMessage',{
+			from : Message.from,
+			text : Message.text,
+			time : Message.time
+		})
+	})
+
+
+
+
+	socket.on('createEmail',(newEmail)=>{
+		console.log('Create email', newEmail);
 	})
 })
 
 server.listen(port,()=>{
 	console.log(`server is up on ${port}`)
 });
+
